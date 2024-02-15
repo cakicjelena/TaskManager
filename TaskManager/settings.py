@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'TaskManagerAPI'
+    'TaskManagerAPI.apps.TaskmanagerapiConfig',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -52,15 +53,15 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK={
-    'DEFAULT_AUTHENTICATION_CLASSES':[
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ]
 }
 
-AUTHENTICATION_BACKENDS=(
-    'django.contrib.auth.backends.ModelBackend',
-)
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+    )
 
 ROOT_URLCONF = "TaskManager.urls"
 
@@ -82,6 +83,12 @@ TEMPLATES = [
     },
 ]
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+    
+]
+
+
 WSGI_APPLICATION = 'TaskManager.wsgi.application'
 
 
@@ -95,9 +102,9 @@ DATABASES = {
     }
 }
 
-DB_TABLES_CONFIG = {
-    'auth':{
-        "USER":"auth_user"
+DB_TABLES_CONFIG ={
+    'auth': {
+           "USER": "auth_user"
     }
 }
 

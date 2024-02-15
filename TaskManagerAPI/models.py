@@ -5,36 +5,38 @@ from datetime import datetime
 # Create your models here.
 
 class UserManager(BaseUserManager):
-    def create_user(self, firstName=None, lastName=None, email=None, password=None, birthDate=datetime.now, sex=1, is_active=0, is_superuser=0, **extra_fields):
-        user=self.model(email=email, **extra_fields)
-        user.firstName=firstName
-        user.lastName=lastName
+    def create_user(self, email, password=None,first_name=None,last_name=None, **extra_fields):
+        #if not email:
+            #raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)
+        user=self.model(email=email,**extra_fields)
         user.set_password(password)
-        user.birthDate=birthDate
-        print(user.birthDate)
-        user.sex=sex
-        user.is_active=is_active
-        user.is_superuser=is_superuser
+        user.first_name=first_name
+        user.last_name=last_name
         user.save(using=self._db)
         return user
+    
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser',True)
+        return self.create_user(email, password, extra_fields)
 
-
+    
 
 class User(AbstractBaseUser):
-    id=models.AutoField(unique=True, null=False, blank=False, primary_key=True)
-    firstName=models.CharField(max_length=50)
-    lastName=models.CharField(max_length=50)
-    email=models.EmailField(max_length=50, unique=True)
-    password=models.CharField(max_length=50)
-    birthDate=models.DateField()
-    sex=models.IntegerField(default=1)
-    is_active=models.IntegerField()
-    is_superuser=models.IntegerField()
+    email=models.EmailField(unique=True)
+    first_name=models.CharField(max_length=30)
+    last_name=models.CharField(max_length=30)
+    password=models.CharField(max_length=30)
+    is_active= models.BooleanField(default=True)
+    is_staff=models.BooleanField(default=False)
+    is_superuser=models.BooleanField(default=False)
 
     USERNAME_FIELD='email'
-    REQUIRED_FIELDS=['firstName', 'lastName']
+    REQUIRED_FIELDS=['first_name','last_name']
 
     objects=UserManager()
+
     def __str__(self):
         return self.email
 
