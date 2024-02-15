@@ -24,12 +24,15 @@ class User(AbstractBaseUser):
     id=models.AutoField(unique=True, null=False, blank=False, primary_key=True)
     firstName=models.CharField(max_length=50)
     lastName=models.CharField(max_length=50)
-    email=models.EmailField(max_length=50)
+    email=models.EmailField(max_length=50, unique=True)
     password=models.CharField(max_length=50)
     birthDate=models.DateField()
     sex=models.IntegerField(default=1)
     is_active=models.IntegerField()
     is_superuser=models.IntegerField()
+
+    USERNAME_FIELD='email'
+    REQUIRED_FIELDS=['firstName', 'lastName']
 
     objects=UserManager()
     def __str__(self):
