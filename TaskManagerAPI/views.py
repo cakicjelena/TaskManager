@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from .models import User
@@ -19,7 +19,9 @@ def create_user_view(request):
     password=request.POST.get('password')
     first_name=request.POST.get('first_name')
     last_name=request.POST.get('last_name')
-    user=User.objects.create_user(email, password, first_name, last_name)
+    sex=request.POST.get('sex')
+    birthDate=request.POST.get('birthDate')
+    user=User.objects.create_user(email, password, first_name, last_name, sex, birthDate)
     serializer=UserSerializer(user)
     #if serializer.is_valid():
         #serializer.save()
@@ -65,3 +67,10 @@ def login_view(request):
 @renderer_classes([TemplateHTMLRenderer])
 def login_template(request):
     return render(request, 'login.html')
+
+
+@api_view(['POST'])
+@csrf_exempt
+def logout_view(request):
+    logout(request)
+    return Response({'User logout'}, status=status.HTTP_200_OK)
