@@ -96,6 +96,16 @@ class Task(models.Model):
     def __str__(self):
         return self.name
     
+class UserOnProjectManager(models.Manager):
+    def create_user_on_project(self, projectId=0, userId=0, projectName=None, userName=None, startDate=None, **extra_fields):
+        user_on_project=self.model(projectName=projectName, **extra_fields)
+        user_on_project.projectId=projectId
+        user_on_project.userId=userId
+        user_on_project.userName=userName
+        user_on_project.startDate=startDate
+        user_on_project.save(using=self._db)
+        return user_on_project
+    
 class UserOnProject(models.Model):
     projectId=models.IntegerField(null=False, blank=False)
     userId=models.IntegerField(null=False, blank=False)
@@ -103,11 +113,20 @@ class UserOnProject(models.Model):
     userName=models.CharField(max_length=100)
     startDate=models.DateField()
 
-class ProjectTask(models.Model):
-    projectId=models.IntegerField(null=False, blank=False)
-    taskId=models.IntegerField(null=False, blank=False)
-    projectName=models.CharField(max_length=100)
-    taskName=models.CharField(max_length=100)
+    objects=UserOnProjectManager()
+
+    def __str__(self):
+        return self.projectName
+
+class UserOnTasktManager(models.Manager):
+    def create_user_on_task(self, taskId=0, userId=0, taskName=None, userName=None, startDate=None, **extra_fields):
+        user_on_task=self.model(taskName=taskName, **extra_fields)
+        user_on_task.taskId=taskId
+        user_on_task.userId=userId
+        user_on_task.userName=userName
+        user_on_task.startDate=startDate
+        user_on_task.save(using=self._db)
+        return user_on_task
 
 class UserOnTask(models.Model):
     taskId=models.IntegerField(null=False, blank= False)
@@ -116,3 +135,27 @@ class UserOnTask(models.Model):
     userName=models.CharField(max_length=100)
     startDate=models.DateField()
 
+    objects=UserOnTasktManager()
+
+    def __str__(self):
+        return self.taskName
+
+
+class CommentOnTasktManager(models.Manager):
+    def create_comment_on_task(self, taskId=0, email=None, comment=None, **extra_fields):
+        comment_on_task=self.model(email=email, **extra_fields)
+        comment_on_task.taskId=taskId
+        comment_on_task.comment=comment
+        comment_on_task.save(using=self._db)
+        return comment_on_task
+
+class CommentOnTask(models.Model):
+    taskId=models.IntegerField(null=False, blank= False)
+    email=models.CharField(max_length=100)
+    comment=models.CharField(max_length=500)
+
+    objects=CommentOnTasktManager()
+
+    def __str__(self):
+        return self.email
+    
