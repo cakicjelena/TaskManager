@@ -5,7 +5,7 @@ from datetime import datetime
 # Create your models here.
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None,first_name=None,last_name=None, sex=None, birthDate=None, **extra_fields):
+    def create_user(self, email, password=None,first_name=None,last_name=None, sex=None, birthDate=None, is_superuser=False, **extra_fields):
         #if not email:
             #raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
@@ -15,12 +15,12 @@ class UserManager(BaseUserManager):
         user.last_name=last_name
         user.sex=sex
         user.birthDate= birthDate
+        user.is_superuser=is_superuser
         user.save(using=self._db)
         return user
     
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser',True)
         return self.create_user(email, password, extra_fields)
 
     
@@ -118,7 +118,7 @@ class UserOnProject(models.Model):
     def __str__(self):
         return self.projectName
 
-class UserOnTasktManager(models.Manager):
+'''class UserOnTasktManager(models.Manager):
     def create_user_on_task(self, taskId=0, userId=0, taskName=None, userName=None, startDate=None, **extra_fields):
         user_on_task=self.model(taskName=taskName, **extra_fields)
         user_on_task.taskId=taskId
@@ -139,7 +139,7 @@ class UserOnTask(models.Model):
 
     def __str__(self):
         return self.taskName
-
+'''
 
 class CommentOnTasktManager(models.Manager):
     def create_comment_on_task(self, taskId=0, email=None, comment=None, **extra_fields):

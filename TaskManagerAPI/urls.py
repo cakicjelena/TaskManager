@@ -10,10 +10,14 @@ urlpatterns=[
     path("createproject/", views.create_project_view, name="createproject"),
     path("createtask/", views.create_task_view, name="createtask"),
     path("createuseronproject/<int:upk>/<int:ppk>", views.create_user_on_project, name="createuseronproject"),
-    path("createuserontask/<int:upk>/<int:ppk>", views.create_user_on_task, name="createuserontask"),
+    #path("createuserontask/<int:upk>/<int:tpk>", views.create_user_on_task, name="createuserontask"),
     path("createcommentontask/<int:upk>/<int:tpk>", views.create_comment_on_task, name="createcommentontask"),
     path("getallprojects/", views.get_all_projects, name="getallprojects"),
     path("getallprojectsofuser/<int:upk>", views.get_all_projects_of_user, name="getallprojectsofuser"),
     path("getalltasksofproject/<int:ppk>", views.get_all_tasks_of_project, name="getalltasksofproject"),
-    path("getalltasksofuser/<int:upk>", views.get_all_tasks_of_user, name="getalltasksofuser")
+    path("getalltasksofuser/<int:upk>", views.get_all_tasks_of_user, name="getalltasksofuser"),
+    path("changetaskstatus/<int:tpk>", views.change_task_status, name="changetaskstatus"),
+    path("deleteproject/<int:ppk>", views.delete_project, name="deleteproject"),
+    path("deletetask/<int:tpk>", views.delete_task, name="deletetask"),
+    path("deleteuser/<int:upk>", views.delete_user, name="deleteuser")
 ]
