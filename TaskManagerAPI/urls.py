@@ -12,6 +12,7 @@ urlpatterns=[
     path("createuseronproject/<int:upk>/<int:ppk>", views.create_user_on_project, name="createuseronproject"),
     #path("createuserontask/<int:upk>/<int:tpk>", views.create_user_on_task, name="createuserontask"),
     path("createcommentontask/<int:upk>/<int:tpk>", views.create_comment_on_task, name="createcommentontask"),
+    path("getallusers/", views.get_all_users, name="getallusers"),
     path("getallprojects/", views.get_all_projects, name="getallprojects"),
     path("getallprojectsofuser/<int:upk>", views.get_all_projects_of_user, name="getallprojectsofuser"),
     path("getalltasksofproject/<int:ppk>", views.get_all_tasks_of_project, name="getalltasksofproject"),

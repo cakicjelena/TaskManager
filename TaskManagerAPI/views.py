@@ -118,7 +118,7 @@ def create_project_view(request):
 
 #Create task
 @api_view(['POST'])
-@login_required
+#@login_required
 @csrf_exempt
 def create_task_view(request):
     name=request.POST.get('name')
@@ -167,6 +167,16 @@ def create_comment_on_task(request, upk, tpk):
     serializer=CommentOnTaskSerializer(comment)
     return Response("Succesfuly put comment on task", status=status.HTTP_200_OK)
 
+#List all users
+@api_view(['GET'])
+#@login_required
+@csrf_exempt
+def get_all_users(request):
+    user=User.objects.all()
+    serializer=UserSerializer(user, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 #List all projects
 @api_view(['GET'])
 #@login_required
@@ -187,7 +197,7 @@ def get_all_projects_of_user(request, upk):
 
 #List all tasks of project
 @api_view(['GET'])
-@login_required
+#@login_required
 @csrf_exempt
 def get_all_tasks_of_project(request, ppk):
     tasks=Task.objects.filter(projectId=ppk)
