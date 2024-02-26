@@ -103,7 +103,7 @@ def edit_profile_view(request, upk):
 
 #Create project
 @api_view(['POST'])
-@login_required
+#@login_required
 @csrf_exempt
 def create_project_view(request):
     name=request.POST.get('name')
@@ -116,11 +116,32 @@ def create_project_view(request):
     serializer=ProjectSerializer(project)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+#Edit project
+@api_view
+@csrf_exempt
+#@login_required
+def edit_project_view(request, ppk):
+    project=Project.objects.get(id=ppk)
+    description=request.POST.get('description')
+    deadlineDate=request.POST.get('deadlineDate')
+    projectManagerId=request.POST.get('projectManagerId')
+    if(description!=""):
+        project.description=description
+    if(deadlineDate!=""):
+        project.deadlineDate=deadlineDate
+    if(projectManagerId!=""):
+        project.projectManagerId=projectManagerId
+    project.save()
+    return Response("Successfuly changed", status=status.HTTP_200_OK)
+
+
 #Create task
 @api_view(['POST'])
 #@login_required
 @csrf_exempt
 def create_task_view(request):
+    print(request)
     name=request.POST.get('name')
     type=request.POST.get('type')
     description=request.POST.get('description')
@@ -227,7 +248,7 @@ def change_task_status(request, tpk):
 #Delete project
 @api_view(['DELETE'])
 @csrf_exempt
-@login_required
+#@login_required
 def delete_project(request, ppk):
     project=Project.objects.get(id=ppk)
     uop=UserOnProject.objects.filter(projectId=ppk)
@@ -240,7 +261,7 @@ def delete_project(request, ppk):
 #Delete task
 @api_view(['DELETE'])
 @csrf_exempt
-@login_required
+#@login_required
 def delete_task(request, tpk):
     task=Task.objects.get(id=tpk)
     comment=CommentOnTask.objects.filter(taskId=tpk)
@@ -260,3 +281,5 @@ def delete_user(request, upk):
     uot.update(userId=-1)
     user.delete()
     return Response("Succesfully deleted user", status=status.HTTP_200_OK)
+
+

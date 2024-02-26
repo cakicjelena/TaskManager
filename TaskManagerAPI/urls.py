@@ -8,6 +8,7 @@ urlpatterns=[
     path("logout/", views.logout_view, name="logout"),
     path("editprofile/<int:upk>", views.edit_profile_view, name="editprofile"),
     path("createproject/", views.create_project_view, name="createproject"),
+    path("editproject/<int:ppk>", views.edit_project_view, name="editproject"),
     path("createtask/", views.create_task_view, name="createtask"),
     path("createuseronproject/<int:upk>/<int:ppk>", views.create_user_on_project, name="createuseronproject"),
     #path("createuserontask/<int:upk>/<int:tpk>", views.create_user_on_task, name="createuserontask"),
