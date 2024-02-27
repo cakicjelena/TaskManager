@@ -118,7 +118,7 @@ def create_project_view(request):
 
 
 #Edit project
-@api_view
+@api_view(['POST'])
 @csrf_exempt
 #@login_required
 def edit_project_view(request, ppk):
@@ -155,6 +155,28 @@ def create_task_view(request):
     serializer=TaskSerializer(task)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+#edit task
+@api_view(['POST'])
+#@login_required
+@csrf_exempt
+def edit_task(request, tpk):
+    task=Task.objects.get(id=tpk)
+    name=request.POST.get('name')
+    description=request.POST.get('description')
+    finishDate=request.POST.get('finishDate')
+    userId=request.POST.get('userId')
+    if(name!=""):
+        task.name=name
+    if(description!=""):
+        task.description=description
+    if(finishDate!=""):
+        task.finishDate=finishDate
+    if(userId!=""):
+        task.userId=userId
+    task.save()
+    return Response("Successfuly changed", status=status.HTTP_200_OK)
+
+
 #Put user on project
 @api_view(['POST'])
 @login_required
@@ -178,7 +200,7 @@ def create_user_on_task(request, upk, tpk):
 
 #Put comment on task
 @api_view(['POST'])
-@login_required
+#@login_required
 @csrf_exempt
 def create_comment_on_task(request, upk, tpk):
     u=User.objects.get(id=upk)
@@ -234,10 +256,28 @@ def get_all_tasks_of_user(request, upk):
     serializer=TaskSerializer(tasks, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+#List all comments
+@api_view(['GET'])
+#@login_required
+@csrf_exempt
+def get_all_comments(request):
+    comment=CommentOnTask.objects.all()
+    serializer=CommentOnTaskSerializer(comment, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+#List all comments of task
+@api_view(['GET'])
+#@login_required
+@csrf_exempt
+def get_all_comments_of_task(request, tpk):
+    comments=CommentOnTask.objects.filter(taskId=tpk)
+    serializer=CommentOnTaskSerializer(comments, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 #Change task status
 @api_view(['POST'])
 @csrf_exempt
-@login_required
+#@login_required
 def change_task_status(request, tpk):
     task=Task.objects.get(id=tpk)
     task.status=request.POST.get('status')
