@@ -208,7 +208,7 @@ def create_comment_on_task(request, upk, tpk):
     comment_on_task=request.POST.get('comment_on_task')
     comment=CommentOnTask.objects.create_comment_on_task(tpk, u.email, comment_on_task)
     serializer=CommentOnTaskSerializer(comment)
-    return Response("Succesfuly put comment on task", status=status.HTTP_200_OK)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 #List all users
 @api_view(['GET'])
