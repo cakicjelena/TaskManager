@@ -14,7 +14,6 @@ from django.contrib.auth.decorators import login_required
 
 #Registration
 @api_view(['POST'])
-@csrf_exempt
 def create_user_view(request):
     
     email=request.POST.get('email')
@@ -35,9 +34,6 @@ def create_user_view(request):
     
 #Login
 @api_view(['POST'])
-
-@csrf_exempt
-
 def login_view(request):
     email=request.data.get('email')
     password = request.data.get('password')
@@ -74,7 +70,6 @@ def login_template(request):
 #Logout
 @api_view(['POST'])
 @login_required
-@csrf_exempt
 def logout_view(request):
     logout(request)
     return Response({'User logout'}, status=status.HTTP_200_OK)
@@ -82,7 +77,6 @@ def logout_view(request):
 #Edit profile
 @api_view(['POST'])
 @login_required
-@csrf_exempt
 def edit_profile_view(request, upk):
     user=User.objects.get(id=upk)
     email=request.POST.get('email')
@@ -103,8 +97,7 @@ def edit_profile_view(request, upk):
 
 #Create project
 @api_view(['POST'])
-#@login_required
-@csrf_exempt
+@login_required
 def create_project_view(request):
     name=request.POST.get('name')
     createDate=request.POST.get('createDate')
@@ -138,8 +131,7 @@ def edit_project_view(request, ppk):
 
 #Create task
 @api_view(['POST'])
-#@login_required
-@csrf_exempt
+@login_required
 def create_task_view(request):
     print(request)
     name=request.POST.get('name')
@@ -157,8 +149,7 @@ def create_task_view(request):
 
 #edit task
 @api_view(['POST'])
-#@login_required
-@csrf_exempt
+@login_required
 def edit_task(request, tpk):
     task=Task.objects.get(id=tpk)
     name=request.POST.get('name')
@@ -180,7 +171,6 @@ def edit_task(request, tpk):
 #Put user on project
 @api_view(['POST'])
 @login_required
-@csrf_exempt
 def create_user_on_project(request, upk, ppk):
     u=User.objects.get(id=upk)
     p=Project.objects.get(id=ppk)
@@ -200,8 +190,7 @@ def create_user_on_task(request, upk, tpk):
 
 #Put comment on task
 @api_view(['POST'])
-#@login_required
-@csrf_exempt
+@login_required
 def create_comment_on_task(request, upk, tpk):
     u=User.objects.get(id=upk)
     t=Task.objects.get(id=tpk)
@@ -212,8 +201,7 @@ def create_comment_on_task(request, upk, tpk):
 
 #List all users
 @api_view(['GET'])
-#@login_required
-@csrf_exempt
+@login_required
 def get_all_users(request):
     user=User.objects.all()
     serializer=UserSerializer(user, many=True)
@@ -222,8 +210,7 @@ def get_all_users(request):
 
 #List all projects
 @api_view(['GET'])
-#@login_required
-@csrf_exempt
+@login_required
 def get_all_projects(request):
     project=Project.objects.all()
     serializer=ProjectSerializer(project, many=True)
@@ -232,7 +219,6 @@ def get_all_projects(request):
 #List all projects of user
 @api_view(['GET'])
 @login_required
-@csrf_exempt
 def get_all_projects_of_user(request, upk):
     projects=UserOnProject.objects.filter(userId=upk)
     serializer=UserOnProjectSerializer(projects, many=True)
@@ -240,8 +226,7 @@ def get_all_projects_of_user(request, upk):
 
 #List all tasks of project
 @api_view(['GET'])
-#@login_required
-@csrf_exempt
+@login_required
 def get_all_tasks_of_project(request, ppk):
     tasks=Task.objects.filter(projectId=ppk)
     serializer=TaskSerializer(tasks, many=True)
@@ -250,7 +235,6 @@ def get_all_tasks_of_project(request, ppk):
 #List all tasks of user
 @api_view(['GET'])
 @login_required
-@csrf_exempt
 def get_all_tasks_of_user(request, upk):
     tasks=Task.objects.filter(userId=upk)
     serializer=TaskSerializer(tasks, many=True)
@@ -258,8 +242,7 @@ def get_all_tasks_of_user(request, upk):
 
 #List all comments
 @api_view(['GET'])
-#@login_required
-@csrf_exempt
+@login_required
 def get_all_comments(request):
     comment=CommentOnTask.objects.all()
     serializer=CommentOnTaskSerializer(comment, many=True)
@@ -267,8 +250,7 @@ def get_all_comments(request):
 
 #List all comments of task
 @api_view(['GET'])
-#@login_required
-@csrf_exempt
+@login_required
 def get_all_comments_of_task(request, tpk):
     comments=CommentOnTask.objects.filter(taskId=tpk)
     serializer=CommentOnTaskSerializer(comments, many=True)
@@ -276,19 +258,18 @@ def get_all_comments_of_task(request, tpk):
 
 #Change task status
 @api_view(['POST'])
-@csrf_exempt
-#@login_required
+@login_required
 def change_task_status(request, tpk):
     task=Task.objects.get(id=tpk)
     task.status=request.POST.get('status')
+    serializer=TaskSerializer(task)
     task.save()
-    return Response("Status of task succesfully changed", status=status.HTTP_200_OK)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 #Delete project
 @api_view(['DELETE'])
-@csrf_exempt
-#@login_required
+@login_required
 def delete_project(request, ppk):
     project=Project.objects.get(id=ppk)
     uop=UserOnProject.objects.filter(projectId=ppk)
@@ -300,8 +281,7 @@ def delete_project(request, ppk):
 
 #Delete task
 @api_view(['DELETE'])
-@csrf_exempt
-#@login_required
+@login_required
 def delete_task(request, tpk):
     task=Task.objects.get(id=tpk)
     comment=CommentOnTask.objects.filter(taskId=tpk)
@@ -311,7 +291,6 @@ def delete_task(request, tpk):
 
 #Delete user
 @api_view(['DELETE'])
-@csrf_exempt
 @login_required
 def delete_user(request, upk):
     user=User.objects.get(id=upk)
