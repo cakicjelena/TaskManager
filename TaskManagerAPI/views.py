@@ -1,13 +1,23 @@
-from django.shortcuts import render, redirect
-from rest_framework.decorators import api_view, renderer_classes
+from django.shortcuts import render
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import User, Task, Project, CommentOnTask, UserOnProject
-from .serializers import UserSerializer, TaskSerializer, ProjectSerializer, CommentOnTaskSerializer, UserOnProjectSerializer
+from .models import *
+from .serializers import *
+
+from django.shortcuts import render, redirect
+from rest_framework.decorators import api_view, renderer_classes, authentication_classes, permission_classes
+from rest_framework.response import Response
+from .models import User, Task, Project, CommentOnTask 
+from .serializers import UserSerializer, TaskSerializer, ProjectSerializer
 from rest_framework import status
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import TemplateHTMLRenderer
 from django.contrib.auth.decorators import login_required
+from rest_framework import generics
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
 
 
 # Create your views here.
@@ -25,10 +35,6 @@ def create_user_view(request):
     is_superuser=request.POST.get('is_superuser')
     user=User.objects.create_user(email, password, first_name, last_name, sex, birthDate, is_superuser)
     serializer=UserSerializer(user)
-    #if serializer.is_valid():
-        #serializer.save()
-        #return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #else:
     return Response(serializer.data,status=status.HTTP_200_OK)
    
     
@@ -41,23 +47,8 @@ def login_view(request):
     if user is not None:
         #token, created = Token.objects.get_or_create(user=user)
         login(request, user)
-        serializer= UserSerializer(user)
-        #renderer_classes = [TemplateHTMLRenderer]
-        #request.session['_old_post'] = request.POST  
-        request.session['user'] = serializer.data 
-        if serializer.data['is_staff'] is False:
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response("Nesto")
-               
-
-        #return redirect("homeUser")
-        #return Response({
-            #'token': token.key,
-            #'user_id': user.id,
-            #'email': user.email
-        #})
-    
+        serializer= UserSerializer(user)   
+        return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Invalid email or password'}, status= status.HTTP_400_BAD_REQUEST)
 
@@ -69,14 +60,14 @@ def login_template(request):
 
 #Logout
 @api_view(['POST'])
-@login_required
+#@login_required
 def logout_view(request):
     logout(request)
     return Response({'User logout'}, status=status.HTTP_200_OK)
 
 #Edit profile
 @api_view(['POST'])
-@login_required
+#@login_required
 def edit_profile_view(request, upk):
     user=User.objects.get(id=upk)
     email=request.POST.get('email')
@@ -97,15 +88,15 @@ def edit_profile_view(request, upk):
 
 #Create project
 @api_view(['POST'])
-@login_required
+#@login_required
 def create_project_view(request):
-    name=request.POST.get('name')
+    namep=request.POST.get('name')
     createDate=request.POST.get('createDate')
     deadlineDate=request.POST.get('deadlineDate')
     description=request.POST.get('description')
     projectManagerId=request.POST.get('projectManagerId')
 
-    project=Project.objects.create_project( name, createDate, deadlineDate, description, projectManagerId)
+    project=Project.objects.create( name=namep, createDate=createDate, deadlineDate=deadlineDate, description=description, projectManagerId=projectManagerId)
     serializer=ProjectSerializer(project)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -131,77 +122,68 @@ def edit_project_view(request, ppk):
 
 #Create task
 @api_view(['POST'])
-@login_required
-def create_task_view(request):
-    print(request)
+#@login_required
+def create_task_view(request, ppk, upk):
+    project1=Project.objects.get(id=ppk)
+    user1=User.objects.get(id=upk)
     name=request.POST.get('name')
     type=request.POST.get('type')
     description=request.POST.get('description')
     statuss=request.POST.get('status')
     startDate=request.POST.get('startDate')
     finishDate=request.POST.get('finishDate')
-    projectId=request.POST.get('projectId')
-    userId=request.POST.get('userId')
 
-    task=Task.objects.create_task( name, type, description, statuss, startDate, finishDate, projectId, userId)
+    task=Task.objects.create( name=name, project=project1, user=user1, type=type, description=description, status=statuss, startDate=startDate, finishDate=finishDate)
     serializer=TaskSerializer(task)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 #edit task
 @api_view(['POST'])
-@login_required
+#@login_required
 def edit_task(request, tpk):
     task=Task.objects.get(id=tpk)
     name=request.POST.get('name')
     description=request.POST.get('description')
     finishDate=request.POST.get('finishDate')
-    userId=request.POST.get('userId')
+    userId=request.POST.get('user')
+    user=User.objects.get(id=userId)
     if(name!=""):
         task.name=name
     if(description!=""):
         task.description=description
     if(finishDate!=""):
         task.finishDate=finishDate
-    if(userId!=""):
-        task.userId=userId
+    if(user!=""):
+        task.user=user
     task.save()
     return Response("Successfuly changed", status=status.HTTP_200_OK)
 
 
 #Put user on project
 @api_view(['POST'])
-@login_required
+#@login_required
 def create_user_on_project(request, upk, ppk):
     u=User.objects.get(id=upk)
     p=Project.objects.get(id=ppk)
-    uop=UserOnProject.objects.create_user_on_project(ppk, upk, p.name, u.email, "2024-02-20")
-    serializer=UserOnProjectSerializer(uop)
-    return Response("Succesfuly put user on project", status=status.HTTP_200_OK)
+    p.users.add(u)
+    serializer=ProjectSerializer(p)
+    return Response(serializer.data, status=status.HTTP_200_OK)
     
-#Put user on task
-'''@api_view(['POST'])
-@csrf_exempt
-def create_user_on_task(request, upk, tpk):
-    u=User.objects.get(id=upk)
-    t=Task.objects.get(id=tpk)
-    uot=UserOnTask.objects.create_user_on_task(tpk, upk, t.name, u.email, "2024-02-20")
-    serializer=UserOnProjectSerializer(uot)
-    return Response("Succesfuly put user on task", status=status.HTTP_200_OK)'''
-
 #Put comment on task
 @api_view(['POST'])
-@login_required
+#@login_required
 def create_comment_on_task(request, upk, tpk):
     u=User.objects.get(id=upk)
     t=Task.objects.get(id=tpk)
-    comment_on_task=request.POST.get('comment_on_task')
-    comment=CommentOnTask.objects.create_comment_on_task(tpk, u.email, comment_on_task)
+    comment_on_task=request.POST.get('comment')
+    comment=CommentOnTask.objects.create(email=u.email, comment=comment_on_task)
+    t.comments.add(comment)
     serializer=CommentOnTaskSerializer(comment)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 #List all users
 @api_view(['GET'])
-@login_required
+#@login_required
 def get_all_users(request):
     user=User.objects.all()
     serializer=UserSerializer(user, many=True)
@@ -210,7 +192,7 @@ def get_all_users(request):
 
 #List all projects
 @api_view(['GET'])
-@login_required
+#@login_required
 def get_all_projects(request):
     project=Project.objects.all()
     serializer=ProjectSerializer(project, many=True)
@@ -218,47 +200,32 @@ def get_all_projects(request):
 
 #List all projects of user
 @api_view(['GET'])
-@login_required
+#@login_required
 def get_all_projects_of_user(request, upk):
-    projects=UserOnProject.objects.filter(userId=upk)
-    serializer=UserOnProjectSerializer(projects, many=True)
+    user1=User.objects.get(id=upk)
+    projects=Project.objects.filter(users=user1)
+    serializer=ProjectSerializer(projects, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 #List all tasks of project
 @api_view(['GET'])
-@login_required
+#@login_required
 def get_all_tasks_of_project(request, ppk):
-    tasks=Task.objects.filter(projectId=ppk)
+    tasks=Task.objects.filter(project=ppk)
     serializer=TaskSerializer(tasks, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 #List all tasks of user
 @api_view(['GET'])
-@login_required
+#@login_required
 def get_all_tasks_of_user(request, upk):
-    tasks=Task.objects.filter(userId=upk)
+    tasks=Task.objects.filter(user=upk)
     serializer=TaskSerializer(tasks, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-#List all comments
-@api_view(['GET'])
-@login_required
-def get_all_comments(request):
-    comment=CommentOnTask.objects.all()
-    serializer=CommentOnTaskSerializer(comment, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-#List all comments of task
-@api_view(['GET'])
-@login_required
-def get_all_comments_of_task(request, tpk):
-    comments=CommentOnTask.objects.filter(taskId=tpk)
-    serializer=CommentOnTaskSerializer(comments, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 #Change task status
 @api_view(['POST'])
-@login_required
+#@login_required
 def change_task_status(request, tpk):
     task=Task.objects.get(id=tpk)
     task.status=request.POST.get('status')
@@ -267,37 +234,45 @@ def change_task_status(request, tpk):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+#List all comments
+@api_view(['GET'])
+#@login_required
+def get_all_comments(request):
+    comment=CommentOnTask.objects.all()
+    serializer=CommentOnTaskSerializer(comment, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+#List all comments of task
+@api_view(['GET'])
+#@login_required
+def get_all_comments_of_task(request, tpk):
+    task=Task.objects.get(id=tpk)
+    comments=task.comments
+    serializer=CommentOnTaskSerializer(comments, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 #Delete project
 @api_view(['DELETE'])
-@login_required
+#@login_required
 def delete_project(request, ppk):
     project=Project.objects.get(id=ppk)
-    uop=UserOnProject.objects.filter(projectId=ppk)
-    top=Task.objects.filter(projectId=ppk)
-    top.delete()
-    uop.delete()
     project.delete()
     return Response("Succesfully deleted project", status=status.HTTP_200_OK)
 
 #Delete task
 @api_view(['DELETE'])
-@login_required
+#@login_required
 def delete_task(request, tpk):
     task=Task.objects.get(id=tpk)
-    comment=CommentOnTask.objects.filter(taskId=tpk)
-    comment.delete()
     task.delete()
     return Response("Succesfully deleted task", status=status.HTTP_200_OK)
 
 #Delete user
 @api_view(['DELETE'])
-@login_required
+#@login_required
 def delete_user(request, upk):
     user=User.objects.get(id=upk)
-    uop=UserOnProject.objects.filter(userId=upk)
-    uop.delete()
-    uot=Task.objects.filter(userId=upk)
-    uot.update(userId=-1)
     user.delete()
     return Response("Succesfully deleted user", status=status.HTTP_200_OK)
 
