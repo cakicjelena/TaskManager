@@ -23,9 +23,10 @@ from rest_framework.authtoken.models import Token
 # Create your views here.
 
 #Registration
+#@csrf_exempt
 @api_view(['POST'])
 def create_user_view(request):
-    
+    print (request.POST.get('first_name'))
     email=request.POST.get('email')
     password=request.POST.get('password')
     first_name=request.POST.get('first_name')
