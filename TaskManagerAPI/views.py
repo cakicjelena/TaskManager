@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
-
+import json
 from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view, renderer_classes, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -67,6 +67,7 @@ def logout_view(request):
     return Response({'User logout'}, status=status.HTTP_200_OK)
 
 #Edit profile
+
 @api_view(['POST'])
 #@login_required
 def edit_profile_view(request, upk):
@@ -84,7 +85,8 @@ def edit_profile_view(request, upk):
     if(last_name!=""):
         user.last_name=last_name
     user.save()
-    return Response("Successfuly changed", status=status.HTTP_200_OK)
+    serializer=UserSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 #Create project
