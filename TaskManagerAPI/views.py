@@ -94,16 +94,21 @@ def edit_profile_view(request, upk):
 
 #Create project
 @api_view(['POST'])
+#@csrf_exempt
 #@login_required
 def create_project_view(request):
-    namep=request.POST.get('name')
-    createDate=request.POST.get('createDate')
-    deadlineDate=request.POST.get('deadlineDate')
-    description=request.POST.get('description')
-    projectManagerId=request.POST.get('projectManagerId')
+    print(request.data.get('createDate'))
+    print(request.data.get('deadlineDate'))
+
+    namep=request.data.get('name')
+    createDate=request.data.get('createDate')
+    deadlineDate=request.data.get('deadlineDate')
+    description=request.data.get('description')
+    projectManagerId=request.data.get('projectManagerId')
 
     project=Project.objects.create( name=namep, createDate=createDate, deadlineDate=deadlineDate, description=description, projectManagerId=projectManagerId)
     serializer=ProjectSerializer(project)
+    print(serializer.data)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
