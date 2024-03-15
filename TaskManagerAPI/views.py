@@ -23,17 +23,17 @@ from rest_framework.authtoken.models import Token
 # Create your views here.
 
 #Registration
-#@csrf_exempt
+@csrf_exempt
 @api_view(['POST'])
 def create_user_view(request):
-    print (request.POST.get('first_name'))
-    email=request.POST.get('email')
-    password=request.POST.get('password')
-    first_name=request.POST.get('first_name')
-    last_name=request.POST.get('last_name')
-    sex=request.POST.get('sex')
-    birthDate=request.POST.get('birthDate')
-    is_superuser=request.POST.get('is_superuser')
+    print (request.data.get('first_name'))
+    email=request.data.get('email')
+    password=request.data.get('password')
+    first_name=request.data.get('first_name')
+    last_name=request.data.get('last_name')
+    sex=request.data.get('sex')
+    birthDate=request.data.get('birthDate')
+    is_superuser=request.data.get('is_superuser')
     user=User.objects.create_user(email, password, first_name, last_name, sex, birthDate, is_superuser)
     serializer=UserSerializer(user)
     return Response(serializer.data,status=status.HTTP_200_OK)
@@ -69,23 +69,26 @@ def logout_view(request):
 #Edit profile
 
 @api_view(['POST'])
+@csrf_exempt
 #@login_required
 def edit_profile_view(request, upk):
     user=User.objects.get(id=upk)
-    email=request.POST.get('email')
-    password=request.POST.get('password')
-    first_name=request.POST.get('first_name')
-    last_name=request.POST.get('last_name')
-    if(email!=""):
+    email=request.data.get('email')
+    password=request.data.get('password')
+    first_name=request.data.get('first_name')
+    last_name=request.data.get('last_name')
+    print(email)
+    if(email!=None and email!=""):
         user.email=email
-    if(password!=""):
+    if(password!=None and password!=""):
         user.set_password(password)
-    if(first_name!=""):
+    if(first_name!=None and first_name!=""):
         user.first_name=first_name
-    if(last_name!=""):
+    if(last_name!=None and last_name!=""):
         user.last_name=last_name
     user.save()
     serializer=UserSerializer(user)
+    print(serializer.data)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
