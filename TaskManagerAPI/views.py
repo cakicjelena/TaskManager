@@ -118,9 +118,9 @@ def create_project_view(request):
 #@login_required
 def edit_project_view(request, ppk):
     project=Project.objects.get(id=ppk)
-    description=request.POST.get('description')
-    deadlineDate=request.POST.get('deadlineDate')
-    projectManagerId=request.POST.get('projectManagerId')
+    description=request.data.get('description')
+    deadlineDate=request.data.get('deadlineDate')
+    projectManagerId=request.data.get('projectManagerId')
     if(description!=""):
         project.description=description
     if(deadlineDate!=""):
@@ -137,12 +137,12 @@ def edit_project_view(request, ppk):
 def create_task_view(request, ppk, upk):
     project1=Project.objects.get(id=ppk)
     user1=User.objects.get(id=upk)
-    name=request.POST.get('name')
-    type=request.POST.get('type')
-    description=request.POST.get('description')
-    statuss=request.POST.get('status')
-    startDate=request.POST.get('startDate')
-    finishDate=request.POST.get('finishDate')
+    name=request.data.get('name')
+    type=request.data.get('type')
+    description=request.data.get('description')
+    statuss=request.data.get('status')
+    startDate=request.data.get('startDate')
+    finishDate=request.data.get('finishDate')
 
     task=Task.objects.create( name=name, project=project1, user=user1, type=type, description=description, status=statuss, startDate=startDate, finishDate=finishDate)
     serializer=TaskSerializer(task)
