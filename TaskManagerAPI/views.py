@@ -150,13 +150,14 @@ def create_task_view(request, ppk, upk):
 
 #edit task
 @api_view(['POST'])
+@csrf_exempt
 #@login_required
 def edit_task(request, tpk):
     task=Task.objects.get(id=tpk)
-    name=request.POST.get('name')
-    description=request.POST.get('description')
-    finishDate=request.POST.get('finishDate')
-    userId=request.POST.get('user')
+    name=request.data.get('name')
+    description=request.data.get('description')
+    finishDate=request.data.get('finishDate')
+    userId=request.data.get('user')
     user=User.objects.get(id=userId)
     if(name!=""):
         task.name=name
