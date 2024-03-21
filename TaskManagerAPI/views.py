@@ -187,7 +187,7 @@ def create_user_on_project(request, upk, ppk):
 def create_comment_on_task(request, upk, tpk):
     u=User.objects.get(id=upk)
     t=Task.objects.get(id=tpk)
-    comment_on_task=request.POST.get('comment')
+    comment_on_task=request.data.get('comment')
     comment=CommentOnTask.objects.create(email=u.email, comment=comment_on_task)
     t.comments.add(comment)
     serializer=CommentOnTaskSerializer(comment)
