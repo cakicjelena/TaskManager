@@ -240,7 +240,7 @@ def get_all_tasks_of_user(request, upk):
 #@login_required
 def change_task_status(request, tpk):
     task=Task.objects.get(id=tpk)
-    task.status=request.POST.get('status')
+    task.status=request.data.get('status')
     serializer=TaskSerializer(task)
     task.save()
     return Response(serializer.data, status=status.HTTP_200_OK)
